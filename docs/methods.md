@@ -4,4 +4,8 @@
 
 ## npm methods 3
 
-'# Hello VuePress'
+可以包括：
+* $decimal
+* 千分位
+* getUrlParams(key)
+* 
