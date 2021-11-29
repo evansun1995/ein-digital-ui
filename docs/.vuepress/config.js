@@ -1,6 +1,7 @@
 module.exports = {
   title: 'Ein Digial UI',
   description: '一应科技数字化事业部PC端后台基础UI组件库，基于element-ui二次封装。',
+  base: '/ein-digital-ui/',
   themeConfig: {
     nav: [
       {
@@ -18,7 +19,6 @@ module.exports = {
       },
       {
         title: '组件',
-        path: '/components/',
         collapsable: false,
         children: ['Table', 'Dialog', 'Drawer', 'Tree', 'Scrollbar', 'ImageViewer', 'Loading']
       }
