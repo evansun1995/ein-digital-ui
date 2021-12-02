@@ -1,5 +1,7 @@
 // 用来覆盖原有样式
 .theme-default-content {
+    max-width: 900px !important;
+
     code {
         color: #d63200;
         padding: 3px 5px;
@@ -13,5 +15,29 @@
         background-color: #f8f8f8;
         -webkit-font-smoothing: initial;
         -moz-osx-font-smoothing: initial;
+    }
+}
+
+.el-table {
+    table {
+        margin: unset;
+    }
+
+    tr {
+        border: unset;
+        background-color: unset;
+    }
+
+    th, td {
+        border: unset;
+        padding: unset;
+    }
+}
+
+.docs-table-wrapper {
+    table {
+        td:nth-child(1) {
+            white-space: nowrap;
+        }
     }
 }
