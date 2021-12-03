@@ -55,7 +55,7 @@ export default {
 
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
-| **auto-height** | 开启后组件会自动计算Table高度，如果设置了`height`属性，将不会自动计算，该属性和`max-height`兼容。<br/>高度计算方法：屏幕高度 - 距根元素顶部距离 - 分页高度或10px。 | boolean | — | false |
+| **auto-height** | 开启后组件会自动计算Table高度，如果设置了`height`属性，将不会自动计算，该属性和`max-height`兼容。<br/>高度计算方法：屏幕高度 - 距根元素顶部距离 - 分页高度或10px。<br/>自动计算时，表格高度不会低于150px。 | boolean | — | false |
 | data | 显示的数据 | array | — | — |
 
 </div>

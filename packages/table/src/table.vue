@@ -92,6 +92,10 @@ export default {
       type: Boolean,
       default: false
     },
+    layoutBottomSpace: {
+      type: Number,
+      default: 0
+    },
     autoLoad: {
       type: Boolean,
       default: true
@@ -158,6 +162,9 @@ export default {
     },
     finalTableHeight() {
       return this.autoCalcHeight ? this.tableHeight : this.height
+    },
+    bottomSpace() {
+      return this.layoutBottomSpace || (this.$EINDIGITAL || {}).layoutBottomSpace
     }
   },
   data() {
@@ -212,12 +219,14 @@ export default {
           const PAGENIGATION_HEIGHT = 32 + 20
           const PAGE_MARGIN_BOTTOM = 10
           tableHeight -= this.showPagination ? PAGENIGATION_HEIGHT : PAGE_MARGIN_BOTTOM
+          console.log(this.bottomSpace)
+          tableHeight -= Number(this.bottomSpace)
           tableHeight = tableHeight < 150 ? 150 : tableHeight
-          let isPercentageString = /^\d+%$/.test(this.height)
+          /* let isPercentageString = /^\d+%$/.test(this.height)
           if (this.height && isPercentageString) {
             let multiple = Number(this.height.slice(0, -1)) / 100
             tableHeight *= multiple
-          }
+          } */
           this.tableHeight = tableHeight + 'px'
         }, delay)
     },
