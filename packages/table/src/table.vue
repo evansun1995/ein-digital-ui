@@ -6,6 +6,7 @@
         v-loading="loading"
         :data="data"
         :size="size"
+        :fit="fit"
         :height="finalTableHeight"
         :max-height="maxHeight"
         :show-header="showHeader"
@@ -17,20 +18,42 @@
         :cell-class-name="cellClassName"
         :span-method="spanMethod"
         :border="border"
-        @selection-change="handleSelectionChange"
-        @row-click="handleRowClick"
-        @current-change="currentChange"
-        @expand-change="expandChange"
+        :stripe="stripe"
         :tree-props="treeProps"
         :row-key="rowKey"
         :expand-row-keys="expandRowKeys"
         :lazy="lazy"
-        :load="loadFunction"
+        :load="treeLoad"
         :show-summary="showSummary"
+        :sum-text="sumText"
         :summary-method="summaryMethod"
         :cell-style="cellStyle"
         :row-class-name="rowClassName"
         :row-style="rowStyle"
+        :current-row-key="currentRowKey"
+        :empty-text="emptyText"
+        :default-expand-all="defaultExpandAll"
+        :default-sort="defaultSort"
+        :tooltip-effect="tooltipEffect"
+        :select-on-indeterminate="selectOnIndeterminate"
+        :indent="indent"
+        @select="eventEmit('select', arguments)"
+        @select-all="eventEmit('select-all', arguments)"
+        @selection-change="eventEmit('selection-change', arguments)"
+        @cell-mouse-enter="eventEmit('cell-mouse-enter', arguments)"
+        @cell-mouse-leave="eventEmit('cell-mouse-leave', arguments)"
+        @cell-click="eventEmit('cell-click', arguments)"
+        @cell-dblclick="eventEmit('cell-dblclick', arguments)"
+        @row-click="handleRowClick"
+        @row-contextmenu="eventEmit('row-contextmenu', arguments)"
+        @row-dblclick="eventEmit('row-dblclick', arguments)"
+        @header-click="eventEmit('header-click', arguments)"
+        @header-contextmenu="eventEmit('header-contextmenu', arguments)"
+        @sort-change="eventEmit('sort-change', arguments)"
+        @filter-change="eventEmit('filter-change', arguments)"
+        @current-change="eventEmit('current-change', arguments)"
+        @header-dragend="eventEmit('header-dragend', arguments)"
+        @expand-change="eventEmit('expand-change', arguments)"
       >
         <slot></slot>
       </el-table>
@@ -55,16 +78,46 @@ import { Table, Pagination } from 'element-ui'
 export default {
   name: 'einTable',
   props: {
+    // start：ein-ui 拓展属性
+    load: {
+      type: Function
+    },
+    autoLoad: {
+      type: Boolean,
+      default: true
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    autoHeight: {
+      type: Boolean,
+      default: false
+    },
+    extraSpace: {
+      type: Number,
+      default: 0
+    },
+    treeLoad: {
+      type: Function
+    },
+    checkOnRowClick: {
+      type: Boolean,
+      default: true
+    },
+    // end：ein-ui 拓展属性
+
+    // start：element-ui 属性
     data: {
       type: Array,
       default: () => [],
       required: true
     },
-    load: {
-      type: Function
-    },
-    loadFunction: {
-      type: Function
+    height: [String, Number],
+    maxHeight: [String, Number],
+    stripe: {
+      type: Boolean,
+      default: false
     },
     pageSize: {
       type: Number,
@@ -78,25 +131,13 @@ export default {
       type: Number,
       default: 0
     },
-    loading: {
-      type: Boolean,
-      default: false
-    },
     size: {
-      default: 'medium',
+      type: String,
       validator: function (value) {
         return ['medium', 'small', 'mini'].indexOf(value) !== -1
       }
     },
-    autoHeight: {
-      type: Boolean,
-      default: false
-    },
-    layoutBottomSpace: {
-      type: Number,
-      default: 0
-    },
-    autoLoad: {
+    fit: {
       type: Boolean,
       default: true
     },
@@ -108,34 +149,39 @@ export default {
       type: Boolean,
       default: true
     },
-    height: [String, Number],
-    maxHeight: [String, Number],
     showHeader: {
-      type: Boolean,
-      default: true
-    },
-    checkOnRowClick: {
       type: Boolean,
       default: true
     },
     highlightCurrentRow: {
       type: Boolean
     },
+    currentRowKey: {},
     headerRowStyle: {},
     headerRowClassName: {},
     headerCellStyle: {},
     headerCellClassName: {},
     border: {
-      type: Boolean
+      type: Boolean,
+      default: false
     },
     spanMethod: {
       type: Function
     },
-    treeProps: {},
+    treeProps: {
+      type: Object,
+      default: () => {
+        return { hasChildren: 'hasChildren', children: 'children' }
+      }
+    },
     rowKey: {},
     expandRowKeys: {},
     lazy: {},
     showSummary: {},
+    sumText: {
+      type: String,
+      default: '合计'
+    },
     summaryMethod: {
       type: Function
     },
@@ -150,7 +196,29 @@ export default {
     },
     rowStyle: {
       type: Function
+    },
+    emptyText: {
+      type: String,
+      default: '暂无数据'
+    },
+    defaultExpandAll: {
+      type: Boolean
+    },
+    defaultSort: {
+      type: Object
+    },
+    tooltipEffect: {
+      type: String
+    },
+    selectOnIndeterminate: {
+      type: Boolean,
+      default: true
+    },
+    indent: {
+      type: Number,
+      default: 16
     }
+    // end：element-ui 属性
   },
   components: {
     [Table.name]: Table,
@@ -163,8 +231,8 @@ export default {
     finalTableHeight() {
       return this.autoCalcHeight ? this.tableHeight : this.height
     },
-    bottomSpace() {
-      return this.layoutBottomSpace || (this.$EINDIGITAL || {}).layoutBottomSpace
+    tableExtraSpace() {
+      return this.extraSpace || (this.$EINDIGITAL || {}).tableExtraSpace || 0
     }
   },
   data() {
@@ -184,8 +252,8 @@ export default {
       }
       this.load && this.load(query)
     },
-    handleSelectionChange(val) {
-      this.$emit('selection-change', val)
+    eventEmit(eventName, args) {
+      this.$emit(eventName, ...args)
     },
     handleSizeChange(size) {
       this.tempSize = size
@@ -216,17 +284,11 @@ export default {
             dom = dom.offsetParent // 如果DOM 节点 的parentNode存在，把当前的节点赋予成parentNode；
           } while (dom && dom.offsetParent)
           let tableHeight = typeof window === 'object' && window.innerHeight - top
-          const PAGENIGATION_HEIGHT = 32 + 20
+          const PAGENIGATION_HEIGHT = 34 + 20
           const PAGE_MARGIN_BOTTOM = 10
           tableHeight -= this.showPagination ? PAGENIGATION_HEIGHT : PAGE_MARGIN_BOTTOM
-          console.log(this.bottomSpace)
-          tableHeight -= Number(this.bottomSpace)
+          tableHeight -= Number(this.tableExtraSpace)
           tableHeight = tableHeight < 150 ? 150 : tableHeight
-          /* let isPercentageString = /^\d+%$/.test(this.height)
-          if (this.height && isPercentageString) {
-            let multiple = Number(this.height.slice(0, -1)) / 100
-            tableHeight *= multiple
-          } */
           this.tableHeight = tableHeight + 'px'
         }, delay)
     },
@@ -240,14 +302,8 @@ export default {
     toggleRowSelection() {
       this.$refs.elTable.toggleRowSelection(...arguments)
     },
-    currentChange() {
-      this.$emit('current-change', ...arguments)
-    },
     setCurrentRow(row) {
       this.$refs.elTable.setCurrentRow(row)
-    },
-    expandChange(row, expanded) {
-      this.$emit('expand-change', row, expanded)
     }
   },
   created() {
@@ -266,12 +322,38 @@ export default {
 </script>
 <style lang="scss" scoped>
 .ein-table {
+  /deep/.el-button--text {
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  /deep/.el-button--small {
+    font-size: 14px;
+  }
+  /deep/.el-table--mini {
+    font-size: 12px;
+    .el-table__cell {
+      padding: 6px 0;
+    }
+    .cell {
+      line-height: 18px;
+    }
+  }
+  /deep/.el-table--small {
+    font-size: 14px;
+    .el-table__cell {
+      padding: 10px 0;
+    }
+    .cell {
+      line-height: 20px;
+    }
+  }
   /deep/.cell {
     white-space: nowrap;
   }
 }
 .ein-table_main {
   /deep/.el-table {
+    color: #2d4059;
     th,
     td {
       &:not(.is-left) {
@@ -288,6 +370,7 @@ export default {
   display: flex;
   justify-content: flex-end;
   padding: 10px 0;
+  align-items: center;
   /deep/.el-pagination.is-background .btn-prev,
   /deep/.el-pagination.is-background .btn-next,
   /deep/.el-pagination.is-background .el-pager li:not(.active) {
@@ -297,10 +380,5 @@ export default {
 }
 /deep/.el-table__fixed-right {
   height: 100% !important;
-}
-/deep/.el-table th {
-  font-weight: normal;
-  color: #606266;
-  font-size: 12px;
 }
 </style>

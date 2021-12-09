@@ -3,7 +3,7 @@
     class="ein-drawer"
     :class="{ 'with-footer': withFooter }"
     :title="title"
-    :visible.sync="drawer"
+    :visible.sync="drawerVisible"
     :direction="direction"
     :show-close="showClose"
     :wrapperClosable="wrapperClosable"
@@ -21,8 +21,8 @@
     <div v-if="withFooter" class="drawer-footer">
       <slot v-if="$slots.footer" name="footer"></slot>
       <template v-else>
-        <el-button @click="onCancel">取 消</el-button>
-        <el-button type="primary" @click="onConfirm">确 定</el-button>
+        <el-button @click="onCancel">{{ cancelText }}</el-button>
+        <el-button type="primary" @click="onConfirm">{{ confirmText }}</el-button>
       </template>
     </div>
   </el-drawer>
@@ -79,7 +79,13 @@ export default {
       type: Boolean,
       default: true
     },
-    beforeClose: { type: Function }
+    beforeClose: { type: Function },
+    cancelText: {
+      default: '取 消'
+    },
+    confirmText: {
+      default: '确 定'
+    }
   },
   components: {
     [Drawer.name]: Drawer,
@@ -89,7 +95,7 @@ export default {
     return {}
   },
   computed: {
-    drawer: {
+    drawerVisible: {
       get() {
         return this.visible
       },
@@ -103,7 +109,17 @@ export default {
       this.$emit('confirm')
     },
     onCancel() {
-      this.$emit('cancel')
+      const cb = () => {
+        this.drawerVisible = false
+        this.$emit('cancel')
+      }
+      // 如果有 beforeClose
+      if (this.beforeClose) {
+        this.beforeClose(cb)
+        return
+      }
+      // 否则直接执行关闭
+      cb()
     }
   }
 }
@@ -119,6 +135,7 @@ export default {
       font-weight: 700;
       color: #303133;
     }
+    border-bottom: 1px solid #dee2ed;
   }
   /deep/.el-drawer__body {
     height: calc(100% - 63px);

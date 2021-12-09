@@ -51,11 +51,16 @@ export default {
 :::
 
 ## Table Attributes
+这里只列举出区别于`element-ui`的属性，理论上`element-ui`所有属性都应做到支持，或通过其他方案替换。
 <div class="docs-table-wrapper">
-
 | 参数 | 说明 | 类型 | 可选值 | 默认值 |
 | --- | --- | --- | --- | --- |
-| **auto-height** | 开启后组件会自动计算Table高度，如果设置了`height`属性，将不会自动计算，该属性和`max-height`兼容。<br/>高度计算方法：屏幕高度 - 距根元素顶部距离 - 分页高度或10px。<br/>自动计算时，表格高度不会低于150px。 | boolean | — | false |
-| data | 显示的数据 | array | — | — |
+| load | 加载表格数据的方法 | Function({currentPage,pageSize}) | — | — |
+| auto-load | 是否在`created`中执行`load`函数 | boolean | true | — |
+| loading | Table主体的loading动画 | boolean | — | — |
+| auto-height | 开启后组件会自动计算Table高度。<br/>高度计算方法：屏幕高度 - 距根元素顶部距离 - 分页高度或10px - `extra-space`。<br/>自动计算时，表格高度不会低于150px。 | boolean | — | false |
+| extra-space | `auto-height`为`true`时生效，计算表格高度时会减去该数值。 | number | — | — |
+| tree-load | 等同于`element-ui`的`load`属性，加载子节点数据的函数。 | Function(row, treeNode, resolve) | — | — |
+| check-on-row-click | 单击行时选中该行复选框 | boolean | — | true |
 
 </div>

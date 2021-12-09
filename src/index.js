@@ -14,9 +14,8 @@ const install = function (Vue, opts = {}) {
     Vue.component(component.name, component)
   })
   Vue.prototype.$imageViewer = ImageViewer
-  console.log('opts', opts)
   Vue.prototype.$EINDIGITAL = {
-    layoutBottomSpace: opts.layoutBottomSpace || 0
+    ...opts
   }
 }
 
