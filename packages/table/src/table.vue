@@ -23,7 +23,7 @@
         :row-key="rowKey"
         :expand-row-keys="expandRowKeys"
         :lazy="lazy"
-        :load="treeLoad"
+        :load="loadFunction"
         :show-summary="showSummary"
         :sum-text="sumText"
         :summary-method="summaryMethod"
@@ -98,7 +98,7 @@ export default {
       type: Number,
       default: 0
     },
-    treeLoad: {
+    loadFunction: {
       type: Function
     },
     checkOnRowClick: {

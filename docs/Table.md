@@ -60,7 +60,7 @@ export default {
 | loading | Table主体的loading动画 | boolean | — | — |
 | auto-height | 开启后组件会自动计算Table高度。<br/>高度计算方法：屏幕高度 - 距根元素顶部距离 - 分页高度或10px - `extra-space`。<br/>自动计算时，表格高度不会低于150px。 | boolean | — | false |
 | extra-space | `auto-height`为`true`时生效，计算表格高度时会减去该数值。 | number | — | — |
-| tree-load | 等同于`element-ui`的`load`属性，加载子节点数据的函数。 | Function(row, treeNode, resolve) | — | — |
+| load-function | 等同于`element-ui`的`load`属性，加载子节点数据的函数。 | Function(row, treeNode, resolve) | — | — |
 | check-on-row-click | 单击行时选中该行复选框 | boolean | — | true |
 
 </div>

@@ -10,6 +10,7 @@
     :size="size"
     :before-close="beforeClose"
     :withHeader="withHeader"
+    :custom-class="customClass"
     append-to-body
   >
     <slot name="title" slot="title"></slot>
@@ -85,7 +86,8 @@ export default {
     },
     confirmText: {
       default: '确 定'
-    }
+    },
+    customClass: {}
   },
   components: {
     [Drawer.name]: Drawer,
